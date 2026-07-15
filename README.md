@@ -98,5 +98,3 @@ This project helped me practice:
 **Muhammad Abdullah Farooq**
 
 GitHub: https://github.com/osaid400
-LinkedIn: linkedin.com/in/muhammad-abdullah-farooq-684ab1350
-Email: osaid.abdullah2007@gmail.com
