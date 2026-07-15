@@ -1,37 +1,77 @@
 # Bank Management System
+# Author: Muhammad Abdullah Farooq
+# Language: Python
+# Level: Beginner
+
+import json
+import os
+import sys
 
 print("============ Welcome to Bank Managment System =============")
 
-accounts = [
-    {"Name" : "Ali", "Balance": 15000, "Account Number": 3011},
-    {"Name" : "Abdullah", "Balance": 23500, "Account Number": 3012},
-    {"Name" : "Ahmed", "Balance": 18000, "Account Number": 3013},
-    {"Name" : "Abdul Hadi", "Balance": 56000, "Account Number": 3014},
-    {"Name" : "Alina", "Balance": 29000, "Account Number": 3015},
-    {"Name" : "Rida", "Balance": 250000, "Account Number": 3016},
-    {"Name" : "Areeba", "Balance": 17000, "Account Number": 3017},
-    {"Name" : "Ayesha", "Balance": 23500, "Account Number": 3018},
-]
+# ---------------- File Handling ----------------
 
+def load_accounts():
+    if os.path.exists("accounts.json"):
+        with open("accounts.json", "r") as file:
+            data = json.load(file)
+        return data
+    else:
+        return []
+
+def save_accounts():
+    with open("accounts.json", "w") as file:
+        json.dump(accounts, file, indent=3)
+
+accounts = load_accounts()
+
+if not accounts:
+    accounts = [
+        {"Name" : "Ali", "Balance": 15000, "Account Number": 3011},
+        {"Name" : "Abdullah", "Balance": 23500, "Account Number": 3012},
+        {"Name" : "Ahmed", "Balance": 18000, "Account Number": 3013},
+        {"Name" : "Abdul Hadi", "Balance": 56000, "Account Number": 3014},
+        {"Name" : "Alina", "Balance": 29000, "Account Number": 3015},
+        {"Name" : "Rida", "Balance": 250000, "Account Number": 3016},
+        {"Name" : "Areeba", "Balance": 17000, "Account Number": 3017},
+        {"Name" : "Ayesha", "Balance": 23500, "Account Number": 3018},
+        {"Name" : "Alishba", "Balance": 43000, "Account Number": 3019},
+        {"Name" : "Bilal", "Balance": 78000, "Account Number": 3020},
+    ]
+    save_accounts()
 
 # Functions of Menu:
+
 def create_account():
-    name = input("Enter the Name: ")
-    account_number = int(input("Enter the Account number: "))
-    balance= int(input("Enter the initial balance: "))
-    
-    if balance < 0:
-        print("Initial Balance cannot be Negative!")
+    name = input("Enter the Name: ").strip()
+    if name == "":
+        print("Name cannot be empty!")
+        return
+
+    try:
+        account_number = int(input("Enter the new account ID: "))
+    except ValueError:
+        print("Invalid account ID! Please enter a number.")
         return
 
     if account_number <= 0:
-        print("Invalid Account Number!")
+        print("Enter a valid account ID!")
         return
 
     for account in accounts:
         if account["Account Number"] == account_number:
-            print("Account Number already exists!")
+            print("account ID already exists!")
             return
+
+    try:
+        balance= int(input("Enter the initial balance: "))
+    except ValueError:
+        print("Invalid Balance!")
+        return
+
+    if balance < 0:
+        print("Initial Balance cannot be Negative!")
+        return
 
     new_account = {
         "Name" : name,
@@ -40,9 +80,9 @@ def create_account():
     }
     
     accounts.append(new_account)
-    
-    print("New Account Added Successfully!")
 
+    save_accounts()
+    print("New Account Added Successfully!")
 
 def view_account():
     for account in accounts:
@@ -53,16 +93,26 @@ def view_account():
         print("---------------------------------------------------")
 
 def deposit_money():
-    search = int(input("Enter the Account number: "))
+    try:
+        search = int(input("Enter the Account number: "))
+    except ValueError:
+        print("Invalid Account Number!")
+        return
+
     found = False
     for account in accounts:
             if account["Account Number"] == search:
                 print("Account Found Successfully!")
-                amount = int(input("Enter Amount: "))
+                try:
+                    amount = int(input("Enter Amount: "))
+                except ValueError:
+                    print("Invalid Amount!")
+                    return
                 if amount <= 0:
                     print("amount cannot be Negative or Zero!")
                     return
                 account["Balance"] += amount
+                save_accounts()
                 print("Money Deposit Successfully!")
                 found = True
                 break
@@ -70,19 +120,28 @@ def deposit_money():
         print("Account Not Found")
 
 def withdraw_money():
-    search = int(input("Enter the Account number: "))
+    try:
+        search = int(input("Enter the Account number: "))
+    except ValueError:
+        print("Invalid Account Number!")
+        return
     found = False
     for account in accounts:
         if account["Account Number"] == search:
             print("Account Found Successfully!")
-            amount = int(input("Enter Amount: "))
+            try:
+                amount = int(input("Enter Amount: "))
+            except ValueError:
+                print("Invalid Amount!")
+                return
             if amount <= 0:
-                    print("Invalid Amount!")
+                    print("Zero and Negative amount can't be withdraw!")
                     return
             if amount > account ["Balance"]:
                 print("Insufficent Balance!")
                 return
             account["Balance"] -= amount
+            save_accounts()
             print("Money Withdraw Successfully!")
             found = True
             break
@@ -90,7 +149,11 @@ def withdraw_money():
         print("Account Not Found")
 
 def check_balance():
-    search = int(input("Enter the Account number: "))
+    try:
+        search = int(input("Enter the Account number: "))
+    except ValueError:
+        print("Invalid Account Number!")
+        return
     found = False
     for account in accounts:
         if account["Account Number"] == search:
@@ -102,7 +165,11 @@ def check_balance():
         print("Account Not Found")
 
 def delete_account():
-    search = int(input("Enter the account number: "))
+    try:
+        search = int(input("Enter the account number: "))
+    except ValueError:
+        print ("Invalid Account Number!")
+        return
     found = False
 
     choice = input("Are you sure? (y/n): ").lower()
@@ -111,6 +178,7 @@ def delete_account():
         for account in accounts:
             if account["Account Number"] == search:
                 accounts.remove(account)
+                save_accounts()
                 print("Account Deleted Successfully!")
                 found = True
                 break
@@ -131,7 +199,11 @@ while True:
     print("6. Delete Account")
     print("0. Exit")
 
-    choice = int(input("Enter the number: "))
+    try:
+        choice = int(input("Enter the number (0-6): "))
+    except ValueError:
+        print("Invalid Number!")
+        continue
 
     if choice == 1:
         create_account()
@@ -148,6 +220,6 @@ while True:
     elif choice == 0:
         print("Thank You for using our application :) ")
         print("Good Bye!")
-        break
+        sys.exit()
     else:
         print("Invalid Choice!")
